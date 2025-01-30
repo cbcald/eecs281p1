@@ -274,14 +274,17 @@ void TreasureHunt::read_data() {
             row = static_cast<size_t>(word) - '0'; 
             cin >> col; 
             cin >> type;
+            pair<int,int> coordinates = {row, col}; 
             Coordinate c (type, '1', false); 
             map[row][col] = c; 
             if (type == '@'){
-                starting_location = {row,col}; 
+                starting_location = coordinates; 
             }
         }
     }
+
 }
+
 
 // Sort and print the data.
 void TreasureHunt::hunt() {
@@ -696,65 +699,49 @@ void TreasureHunt::print_stats(){
 
 void TreasureHunt::find_path_map(){
 
-    pair<size_t, size_t> current = treasure_location; 
+    
+    pair<size_t,size_t> current = treasure_location; 
     map[treasure_location.first][treasure_location.second].change_type('X'); 
 
-    pair <size_t, size_t> next;  
+    pair<size_t,size_t> next; 
 
         while (map[next.first][next.second].get_type() != '@') {
-            char c = map[current.first][current.second].get_direction(); 
-            char n; 
 
             if (map[current.first][current.second].get_direction() == 'N'){
-                next = {current.first+1, current.second}; 
-                n = 'N'; 
+                next = {current.first+1 ,current.second}; 
             }
             else if (map[current.first][current.second].get_direction() == 'S'){
-                next = {current.first-1, current.second}; 
-                n = 'S'; 
+                next = {current.first-1,current.second}; 
             }
             else if (map[current.first][current.second].get_direction() == 'W'){
                 next = {current.first, current.second +1}; 
-                n = 'W'; 
             }
             else if (map[current.first][current.second].get_direction() == 'E'){
-                next = {current.first, current.second-1}; 
-                n ='E'; 
-            }
-            if (c == 'N'){
-                if (n =='E' || n =='W'){
-                    map[current.first+1][current.second].change_type('+'); 
-                }
-                else if (n == 'S' || n == 'N'){
-                    map[current.first+1][current.second].change_type('|'); 
-                }
+                next = {current.first,current.second -1}; 
             }
 
-            else if (c == 'S'){
-                if (n =='E' || n =='W'){
-                    map[current.first-1][current.second].change_type('+'); 
+            if ((map[current.first][current.second].get_direction() == 'S' || 
+                map[current.first][current.second].get_direction() == 'N')
+                && (map[next.first][next.second].get_direction() == 'E' ||
+                    map[next.first][next.second].get_direction() == 'W') ){
+                    map[next.first][next.second].change_type('+'); 
                 }
-                else if (n == 'S' || n == 'N'){
-                    map[current.first-1][current.second].change_type('|'); 
+
+            else if ((map[next.first][next.second].get_direction() == 'S' || 
+                    map[next.first][next.second].get_direction() == 'N')
+                    && (map[current.first][current.second].get_direction() == 'E' || 
+                    map[current.first][current.second].get_direction() == 'W') ){
+                    map[next.first][next.second].change_type('+'); 
                 }
+
+            else if (map[next.first][next.second].get_direction() == 'S' || 
+                   map[next.first][next.second].get_direction() == 'N'){
+                    map[next.first][next.second].change_type('|'); 
             }
 
-            else if (c == 'E'){
-                if (n =='S' || n =='N'){
-                    map[current.first][current.second-1].change_type('+'); 
-                }
-                else if (n == 'E' || n == 'W'){
-                    map[current.first][current.second-1].change_type('-'); 
-                }
-            }
-
-            else if (c == 'W'){
-                if (n == 'S' || n =='N'){
-                     map[current.first][current.second+1].change_type('+'); 
-                }
-                else if (n == 'E' || n == 'W'){
-                    map[current.first][current.second+1].change_type('-'); 
-                }
+            else if (map[next.first][next.second].get_direction() == 'W' || 
+                    map[next.first][next.second].get_direction() == 'E'){
+                    map[next.first][next.second].change_type('-'); 
             }
 
             current = next;             
